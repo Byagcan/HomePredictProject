@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.linear_model import LinearRegression
 
 
 df=pd.read_csv("housing.csv")
@@ -62,3 +63,27 @@ train_data['households']= np.log(train_data['households']+1)
 
 train_data['bedroom_ratio']=train_data['total_bedrooms']/ train_data['total_rooms']
 train_data['households_rooms']= train_data['total_rooms']/ train_data['households']
+
+x_train,y_train,=train_data.drop(['median_house_value'], axis=1), train_data['median_house_value']
+model = LinearRegression()
+
+model.fit(x_train,y_train)
+
+test_data = x_test.join(y_test)
+
+test_data['total_rooms']= np.log(test_data['total_rooms']+1)
+test_data['total_bedrooms']= np.log(test_data['total_bedrooms']+1)
+test_data['population']= np.log(test_data['population']+1)
+test_data['households']= np.log(test_data['households']+1)
+
+test_data = test_data.join(pd.get_dummies(test_data.ocean_proximity)).drop(['ocean_proximity'],axis=1)
+
+test_data['bedroom_ratio']=test_data['total_bedrooms']/ test_data['total_rooms']
+test_data['households_rooms']= test_data['total_rooms']/ test_data['households']
+
+
+
+x_test,y_test = test_data.drop(['median_house_value'], axis=1), test_data['median_house_value']
+
+
+print(model.score(x_test,y_test))
